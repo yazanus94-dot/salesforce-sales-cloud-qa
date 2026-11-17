@@ -38,11 +38,14 @@ npm test
 
 ### 4. Submit a Pull Request
 
-- Create a feature branch from `main`
+- Create a feature branch from `develop`: `git checkout -b feature/<type>-<description> develop`
 - Make your changes
 - Add or update tests as needed
 - Ensure all existing tests pass
-- Open a pull request with a clear description
+- Open a pull request against `develop` with a clear description
+- PRs are squash-merged into `develop`; releases are merged into `main`
+
+See [docs/git-workflow.md](docs/git-workflow.md) for the full branching, commit, PR, and review workflow.
 
 ## Code Style
 

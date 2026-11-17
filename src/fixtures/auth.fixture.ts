@@ -37,7 +37,7 @@ export class AuthFixture {
 
     if (!username || !password) {
       throw new Error(
-        'SF_USERNAME and SF_PASSWORD environment variables are required for Salesforce authentication'
+        'SF_USERNAME and SF_PASSWORD environment variables are required for Salesforce authentication',
       );
     }
 
@@ -55,7 +55,7 @@ export class AuthFixture {
   async isLoggedIn(): Promise<boolean> {
     try {
       const appLauncher = this.page.locator(
-        'button[title="App Launcher"], div.slds-radar-header div.slds-button'
+        'button[title="App Launcher"], div.slds-radar-header div.slds-button',
       );
       await appLauncher.waitFor({ state: 'visible', timeout: 5000 });
       return true;

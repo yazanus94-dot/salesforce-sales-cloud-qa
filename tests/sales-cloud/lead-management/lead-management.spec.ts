@@ -15,7 +15,7 @@ test.describe('Lead Management', () => {
     await leadPage.clickNew();
     await leadPage.fillLeadForm(data);
     await leadPage.save();
-    await expect(leadPage.leadExists(`${data.firstName} ${data.lastName}`)).toBeTruthy();
+    expect(leadPage.leadExists(`${data.firstName} ${data.lastName}`)).toBeTruthy();
   });
 
   test('TC-02: Validate mandatory fields @smoke @regression', async ({ leadPage, auth }) => {
@@ -48,7 +48,7 @@ test.describe('Lead Management', () => {
     await leadPage.fillLeadForm(data);
     await leadPage.save();
     await leadPage.searchLead(data.lastName);
-    await expect(leadPage.leadExists(data.lastName)).toBeTruthy();
+    expect(leadPage.leadExists(data.lastName)).toBeTruthy();
   });
 
   test('TC-05: Update Lead information @regression', async ({ leadPage, auth }) => {
@@ -58,13 +58,13 @@ test.describe('Lead Management', () => {
     await leadPage.clickNew();
     await leadPage.fillLeadForm(data);
     await leadPage.save();
-    await expect(leadPage.leadExists(`${data.firstName} ${data.lastName}`)).toBeTruthy();
+    expect(leadPage.leadExists(`${data.firstName} ${data.lastName}`)).toBeTruthy();
 
     // Update the lead status
     await leadPage.openLead(`${data.firstName} ${data.lastName}`);
     await leadPage.fillLeadForm({ ...data, status: 'Contacted' });
     await leadPage.save();
-    await expect(leadPage.leadExists(`${data.firstName} ${data.lastName}`)).toBeTruthy();
+    expect(leadPage.leadExists(`${data.firstName} ${data.lastName}`)).toBeTruthy();
   });
 
   test('TC-06: Verify saved information after refreshing the page @regression', async ({ leadPage, auth }) => {
@@ -74,13 +74,13 @@ test.describe('Lead Management', () => {
     await leadPage.clickNew();
     await leadPage.fillLeadForm(data);
     await leadPage.save();
-    await expect(leadPage.leadExists(`${data.firstName} ${data.lastName}`)).toBeTruthy();
+    expect(leadPage.leadExists(`${data.firstName} ${data.lastName}`)).toBeTruthy();
 
     // Refresh and verify persistence
     await leadPage.page.reload();
     await leadPage.waitForPageLoad();
     await leadPage.searchLead(data.lastName);
-    await expect(leadPage.leadExists(data.lastName)).toBeTruthy();
+    expect(leadPage.leadExists(data.lastName)).toBeTruthy();
   });
 
   test('TC-07: Validate duplicate Lead handling @regression', async ({ leadPage, auth }) => {
@@ -92,7 +92,7 @@ test.describe('Lead Management', () => {
     await leadPage.clickNew();
     await leadPage.fillLeadForm(data);
     await leadPage.save();
-    await expect(leadPage.leadExists(`${data.firstName} ${data.lastName}`)).toBeTruthy();
+    expect(leadPage.leadExists(`${data.firstName} ${data.lastName}`)).toBeTruthy();
 
     // Attempt to create duplicate
     await leadPage.clickNew();

@@ -16,7 +16,7 @@ export function uniqueSuffix(): string {
  * @param overrides - Field values to override defaults
  */
 export function leadData(
-  overrides: Record<string, string> = {}
+  overrides: Record<string, string> = {},
 ): {
   salutation: string;
   firstName: string;
@@ -61,7 +61,7 @@ export function leadData(
  * @param overrides - Field values to override defaults
  */
 export function accountData(
-  overrides: Record<string, string> = {}
+  overrides: Record<string, string> = {},
 ): {
   name: string;
   type: string;
@@ -94,7 +94,7 @@ export function accountData(
  * @param overrides - Field values to override defaults
  */
 export function contactData(
-  overrides: Record<string, string> = {}
+  overrides: Record<string, string> = {},
 ): {
   salutation: string;
   firstName: string;
@@ -130,7 +130,7 @@ export function contactData(
  * @param overrides - Field values to override defaults
  */
 export function opportunityData(
-  overrides: Record<string, string> = {}
+  overrides: Record<string, string> = {},
 ): {
   name: string;
   account: string;
@@ -143,7 +143,7 @@ export function opportunityData(
 } {
   const suffix = uniqueSuffix();
   const futureDate = new Date(
-    Date.now() + 90 * 24 * 60 * 60 * 1000
+    Date.now() + 90 * 24 * 60 * 60 * 1000,
   )
     .toISOString()
     .split('T')[0];
@@ -166,6 +166,51 @@ export function opportunityData(
     probability: string;
     type: string;
     leadSource: string;
+  };
+}
+
+/**
+ * Case test data factory.
+ * @param overrides - Field values to override defaults
+ */
+export function caseData(
+  overrides: Record<string, string> = {},
+): {
+  subject: string;
+  description: string;
+  origin: string;
+  priority: string;
+  status: string;
+  reason: string;
+  type: string;
+  account: string;
+  contact: string;
+  assignedTo: string;
+} {
+  const suffix = uniqueSuffix();
+  return {
+    subject: overrides.subject || `Support Case ${suffix}`,
+    description: overrides.description || `Test case description ${suffix}`,
+    origin: overrides.origin || 'Phone',
+    priority: overrides.priority || 'Medium',
+    status: overrides.status || 'New',
+    reason: overrides.reason || 'Installation Issue',
+    type: overrides.type || 'Customer Support',
+    account: overrides.account || '',
+    contact: overrides.contact || '',
+    assignedTo: overrides.assignedTo || '',
+    ...overrides,
+  } as {
+    subject: string;
+    description: string;
+    origin: string;
+    priority: string;
+    status: string;
+    reason: string;
+    type: string;
+    account: string;
+    contact: string;
+    assignedTo: string;
   };
 }
 

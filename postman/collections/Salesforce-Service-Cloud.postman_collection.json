@@ -1,0 +1,362 @@
+{
+  "info": {
+    "name": "Salesforce Service Cloud API - Project 2",
+    "description": "Postman collection for Salesforce Service Cloud REST API testing (Cases, SOQL, OAuth authentication). Part of Project 2 - Service Cloud & API Automation Testing.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_variable_scope": "variables"
+  },
+  "variable": [
+    {
+      "key": "loginUrl",
+      "value": "https://login.salesforce.com",
+      "type": "string",
+      "description": "Salesforce login URL (login.salesforce.com or test.salesforce.com)"
+    },
+    {
+      "key": "apiVersion",
+      "value": "v60.0",
+      "type": "string",
+      "description": "Salesforce REST API version"
+    },
+    {
+      "key": "clientId",
+      "value": "",
+      "type": "string",
+      "description": "Connected App Consumer Key"
+    },
+    {
+      "key": "clientSecret",
+      "value": "",
+      "type": "string",
+      "description": "Connected App Consumer Secret"
+    },
+    {
+      "key": "username",
+      "value": "",
+      "type": "string",
+      "description": "Salesforce username"
+    },
+    {
+      "key": "password",
+      "value": "",
+      "type": "string",
+      "description": "Salesforce password + security token"
+    },
+    {
+      "key": "instanceUrl",
+      "value": "",
+      "type": "string",
+      "description": "Salesforce instance URL (set after auth)"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string",
+      "description": "OAuth access token (set after auth)"
+    },
+    {
+      "key": "caseId",
+      "value": "",
+      "type": "string",
+      "description": "Case record ID (set after create)"
+    },
+    {
+      "key": "caseNumber",
+      "value": "",
+      "type": "string",
+      "description": "Case number"
+    },
+    {
+      "key": "subject",
+      "value": "Postman Test Case",
+      "type": "string",
+      "description": "Case subject"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. OAuth Authentication",
+      "item": [
+        {
+          "name": "Authenticate - Username Password Flow",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "password",
+                  "type": "text"
+                },
+                {
+                  "key": "client_id",
+                  "value": "{{clientId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "{{clientSecret}}",
+                  "type": "text"
+                },
+                {
+                  "key": "username",
+                  "value": "{{username}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{loginUrl}}/services/oauth2/token",
+              "host": ["{{loginUrl}}", "services", "oauth2", "token"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"access_token\":\"<token>\",\"instance_url\":\"<instance>\",\"id\":\"<id>\",\"issued_at\":\"<issued>\"}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (responseCode === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  pm.variables.set(\"accessToken\", jsonData.access_token);",
+                  "  pm.variables.set(\"instanceUrl\", jsonData.instance_url);",
+                  "  pm.test(\"Authentication successful\", function () {",
+                  "    pm.expect(jsonData.access_token).to.not.be.empty;",
+                  "    pm.expect(jsonData.instance_url).to.not.be.empty;",
+                  "  });",
+                  "} else {",
+                  "  pm.test(\"Authentication failed\", function () {",
+                  "    pm.expect.fail(\"Status: \" + responseCode + \" Body: \" + responseBody);",
+                  "  });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Case Management",
+      "item": [
+        {
+          "name": "Create Case",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Subject\": \"{{subject}}\",\n  \"Description\": \"Created via Postman collection\",\n  \"Status\": \"New\",\n  \"Priority\": \"Medium\"\n}"
+            },
+            "url": {
+              "raw": "{{instanceUrl}}/services/data/{{apiVersion}}/sobjects/Case",
+              "host": ["{{instanceUrl}}", "services", "data", "{{apiVersion}}", "sobjects", "Case"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Response has success flag\", function () {",
+                  "  var json = pm.response.json();",
+                  "  pm.expect(json.success).to.equal(true);",
+                  "});",
+                  "pm.test(\"Response has case ID\", function () {",
+                  "  var json = pm.response.json();",
+                  "  pm.expect(json.id).to.not.be.empty;",
+                  "  pm.variables.set(\"caseId\", json.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          }
+        },
+        {
+          "name": "Get Case by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{instanceUrl}}/services/data/{{apiVersion}}/sobjects/Case/{{caseId}}",
+              "host": ["{{instanceUrl}}", "services", "data", "{{apiVersion}}", "sobjects", "Case", "{{caseId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Case ID matches\", function () {",
+                  "  var json = pm.response.json();",
+                  "  pm.expect(json.Id).to.equal(pm.variables.get(\"caseId\"));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          }
+        },
+        {
+          "name": "Update Case",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Priority\": \"High\",\n  \"Status\": \"Working\"\n}"
+            },
+            "url": {
+              "raw": "{{instanceUrl}}/services/data/{{apiVersion}}/sobjects/Case/{{caseId}}",
+              "host": ["{{instanceUrl}}", "services", "data", "{{apiVersion}}", "sobjects", "Case", "{{caseId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status is 204\", function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Case (if needed)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{instanceUrl}}/services/data/{{apiVersion}}/sobjects/Case/{{caseId}}",
+              "host": ["{{instanceUrl}}", "services", "data", "{{apiVersion}}", "sobjects", "Case", "{{caseId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status is 204\", function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. SOQL Queries",
+      "item": [
+        {
+          "name": "SOQL - Query Cases",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{instanceUrl}}/services/data/{{apiVersion}}/query?q=SELECT+Id%2C+CaseNumber%2C+Subject%2C+Status%2C+Priority+FROM+Case+LIMIT+10",
+              "host": ["{{instanceUrl}}", "services", "data", "{{apiVersion}}", "query"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id, CaseNumber, Subject, Status, Priority FROM Case LIMIT 10",
+                  "disabled": false
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Records returned\", function () {",
+                  "  var json = pm.response.json();",
+                  "  pm.expect(json.records).to.be.an('array');",
+                  "  pm.variables.set(\"caseNumber\", json.records[0]?.CaseNumber || '');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -16,13 +16,13 @@ test.describe('Opportunity Management', () => {
     await accountPage.clickNew();
     await accountPage.fillAccountForm(account);
     await accountPage.save();
-    await expect(accountPage.accountExists(account.name)).toBeTruthy();
+    expect(accountPage.accountExists(account.name)).toBeTruthy();
 
     await opportunityPage.gotoOpportunitiesTab();
     await opportunityPage.clickNew();
     await opportunityPage.fillOpportunityForm(opp);
     await opportunityPage.save();
-    await expect(opportunityPage.opportunityExists(opp.name)).toBeTruthy();
+    expect(opportunityPage.opportunityExists(opp.name)).toBeTruthy();
   });
 
   test('TC-13: Associate Opportunity with correct Account @regression', async ({ opportunityPage, accountPage, auth }) => {
@@ -39,7 +39,7 @@ test.describe('Opportunity Management', () => {
     await opportunityPage.clickNew();
     await opportunityPage.fillOpportunityForm(opp);
     await opportunityPage.save();
-    await expect(opportunityPage.opportunityExists(opp.name)).toBeTruthy();
+    expect(opportunityPage.opportunityExists(opp.name)).toBeTruthy();
 
     // Verify account association on opportunity detail
     await opportunityPage.openOpportunity(opp.name);
@@ -54,11 +54,11 @@ test.describe('Opportunity Management', () => {
     await opportunityPage.clickNew();
     await opportunityPage.fillOpportunityForm(opp);
     await opportunityPage.save();
-    await expect(opportunityPage.opportunityExists(opp.name)).toBeTruthy();
+    expect(opportunityPage.opportunityExists(opp.name)).toBeTruthy();
 
     // Update stage
     await opportunityPage.updateStage(opp.name, 'Qualification');
-    await expect(opportunityPage.opportunityExists(opp.name)).toBeTruthy();
+    expect(opportunityPage.opportunityExists(opp.name)).toBeTruthy();
   });
 
   test('TC-15: Verify Opportunity details and persistence @regression', async ({ opportunityPage, auth }) => {
@@ -68,7 +68,7 @@ test.describe('Opportunity Management', () => {
     await opportunityPage.clickNew();
     await opportunityPage.fillOpportunityForm(opp);
     await opportunityPage.save();
-    await expect(opportunityPage.opportunityExists(opp.name)).toBeTruthy();
+    expect(opportunityPage.opportunityExists(opp.name)).toBeTruthy();
 
     // Open and verify details
     await opportunityPage.openOpportunity(opp.name);
@@ -79,7 +79,7 @@ test.describe('Opportunity Management', () => {
     await opportunityPage.page.reload();
     await opportunityPage.waitForPageLoad();
     await opportunityPage.searchOpportunity(opp.name);
-    await expect(opportunityPage.opportunityExists(opp.name)).toBeTruthy();
+    expect(opportunityPage.opportunityExists(opp.name)).toBeTruthy();
   });
 
   test('TC-16: Validate mandatory fields for Opportunity @regression', async ({ opportunityPage, auth }) => {

@@ -29,7 +29,7 @@ export class BasePage {
    * Wait for a page to fully load by ensuring spinners are gone.
    */
   async waitForPageLoad(): Promise<void> {
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState('domcontentloaded');
     // Wait for loading spinner to disappear if present
     try {
       await this.loadingSpinner.waitFor({ state: 'hidden', timeout: 10000 });

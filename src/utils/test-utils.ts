@@ -3,11 +3,13 @@
  * Includes retry logic, random data generation, date helpers, and trace utilities.
  */
 
+import type { Page } from '@playwright/test';
+
 /**
  * Generate a random string of specified length.
  * @param length - Length of the string
  */
-export function randomString(length: number = 8): string {
+export function randomString(length = 8): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
   for (let i = 0; i < length; i++) {
@@ -34,7 +36,7 @@ export function randomPhone(): string {
  * Format a date as YYYY-MM-DD.
  * @param daysFromNow - Days offset from today
  */
-export function futureDate(daysFromNow: number = 30): string {
+export function futureDate(daysFromNow = 30): string {
   const date = new Date(Date.now() + daysFromNow * 24 * 60 * 60 * 1000);
   return date.toISOString().split('T')[0];
 }
@@ -47,8 +49,8 @@ export function futureDate(daysFromNow: number = 30): string {
  */
 export async function retryWithBackoff<T>(
   fn: () => Promise<T>,
-  maxAttempts: number = 3,
-  baseDelay: number = 1000
+  maxAttempts = 3,
+  baseDelay = 1000,
 ): Promise<T> {
   let lastError: Error | null = null;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -73,12 +75,12 @@ export async function retryWithBackoff<T>(
  */
 export async function waitForCondition(
   condition: () => Promise<boolean>,
-  timeout: number = 10000,
-  interval: number = 500
+  timeout = 10000,
+  interval = 500,
 ): Promise<boolean> {
   const start = Date.now();
   while (Date.now() - start < timeout) {
-    if (await condition()) return true;
+    if (await condition()) {return true;}
     await new Promise((resolve) => setTimeout(resolve, interval));
   }
   return false;
@@ -89,7 +91,7 @@ export async function waitForCondition(
  * @param page - Playwright Page
  * @param name - Screenshot name
  */
-export async function captureScreenshot(page: import('@playwright/test').Page, name: string): Promise<void> {
+export async function captureScreenshot(page: Page, name: string): Promise<void> {
   await page.screenshot({
     path: `screenshots/${name}-${Date.now()}.png`,
     fullPage: true,

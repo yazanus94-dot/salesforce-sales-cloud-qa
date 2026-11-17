@@ -29,26 +29,26 @@ export class OpportunityPage extends BasePage {
     super(page);
     this.newButton = page.locator('button:has-text("New"), a:has-text("New")');
     this.opportunityNameColumn = page.locator(
-      'th[title="Opportunity Name"], span[title*="Opportunity Name"]'
+      'th[title="Opportunity Name"], span[title*="Opportunity Name"]',
     );
     this.searchInput = page.locator(
-      'input[placeholder*="Search"], input[name="Opportunity Name"]'
+      'input[placeholder*="Search"], input[name="Opportunity Name"]',
     );
 
     // Opportunity form fields
     this.opportunityNameInput = page.locator(
-      'input[name="name"], input[id*="OpportunityName"]'
+      'input[name="name"], input[id*="OpportunityName"]',
     );
     this.accountInput = page.locator('input[name="accountName"], input[id*="Account"]');
     this.closeDateInput = page.locator('input[name="closeDate"], input[id*="CloseDate"]');
     this.stageSelect = page.locator('select[name="stage"], input[name="Stage"]');
     this.amountInput = page.locator('input[name="amount"], input[id*="Amount"]');
     this.probabilityInput = page.locator(
-      'input[name="probability"], input[id*="Probability"]'
+      'input[name="probability"], input[id*="Probability"]',
     );
     this.typeSelect = page.locator('select[name="type"], input[name="Type"]');
     this.leadSourceSelect = page.locator(
-      'select[name="leadSource"], input[name="LeadSource"]'
+      'select[name="leadSource"], input[name="LeadSource"]',
     );
 
     // Actions
@@ -90,13 +90,13 @@ export class OpportunityPage extends BasePage {
     leadSource?: string;
   }): Promise<void> {
     await this.safeFill(this.opportunityNameInput, data.name);
-    if (data.account) await this.safeFill(this.accountInput, data.account);
-    if (data.closeDate) await this.safeFill(this.closeDateInput, data.closeDate);
-    if (data.stage) await this.safeFill(this.stageSelect, data.stage);
-    if (data.amount) await this.safeFill(this.amountInput, data.amount);
-    if (data.probability) await this.safeFill(this.probabilityInput, data.probability);
-    if (data.type) await this.safeFill(this.typeSelect, data.type);
-    if (data.leadSource) await this.safeFill(this.leadSourceSelect, data.leadSource);
+    if (data.account) {await this.safeFill(this.accountInput, data.account);}
+    if (data.closeDate) {await this.safeFill(this.closeDateInput, data.closeDate);}
+    if (data.stage) {await this.safeFill(this.stageSelect, data.stage);}
+    if (data.amount) {await this.safeFill(this.amountInput, data.amount);}
+    if (data.probability) {await this.safeFill(this.probabilityInput, data.probability);}
+    if (data.type) {await this.safeFill(this.typeSelect, data.type);}
+    if (data.leadSource) {await this.safeFill(this.leadSourceSelect, data.leadSource);}
   }
 
   /**

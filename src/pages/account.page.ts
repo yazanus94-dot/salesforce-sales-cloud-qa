@@ -74,11 +74,11 @@ export class AccountPage extends BasePage {
     annualRevenue?: string;
   }): Promise<void> {
     await this.safeFill(this.accountNameInput, data.name);
-    if (data.type) await this.safeFill(this.typeSelect, data.type);
-    if (data.industry) await this.safeFill(this.industrySelect, data.industry);
-    if (data.website) await this.safeFill(this.websiteInput, data.website);
-    if (data.phone) await this.safeFill(this.phoneInput, data.phone);
-    if (data.annualRevenue) await this.safeFill(this.annualRevenueInput, data.annualRevenue);
+    if (data.type) {await this.safeFill(this.typeSelect, data.type);}
+    if (data.industry) {await this.safeFill(this.industrySelect, data.industry);}
+    if (data.website) {await this.safeFill(this.websiteInput, data.website);}
+    if (data.phone) {await this.safeFill(this.phoneInput, data.phone);}
+    if (data.annualRevenue) {await this.safeFill(this.annualRevenueInput, data.annualRevenue);}
   }
 
   /**

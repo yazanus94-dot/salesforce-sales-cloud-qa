@@ -76,13 +76,13 @@ export class ContactPage extends BasePage {
     phone?: string;
     title?: string;
   }): Promise<void> {
-    if (data.salutation) await this.safeFill(this.salutationSelect, data.salutation);
+    if (data.salutation) {await this.safeFill(this.salutationSelect, data.salutation);}
     await this.safeFill(this.firstNameInput, data.firstName);
     await this.safeFill(this.lastNameInput, data.lastName);
-    if (data.account) await this.safeFill(this.accountInput, data.account);
-    if (data.email) await this.safeFill(this.emailInput, data.email);
-    if (data.phone) await this.safeFill(this.phoneInput, data.phone);
-    if (data.title) await this.safeFill(this.titleInput, data.title);
+    if (data.account) {await this.safeFill(this.accountInput, data.account);}
+    if (data.email) {await this.safeFill(this.emailInput, data.email);}
+    if (data.phone) {await this.safeFill(this.phoneInput, data.phone);}
+    if (data.title) {await this.safeFill(this.titleInput, data.title);}
   }
 
   /**

@@ -6,7 +6,8 @@ This directory is reserved for test evidence and diagrams.
 
 | Image | Purpose | Status |
 |-------|---------|--------|
-| `architecture.png` | System architecture diagram | ⏳ TBD - Mermaid diagram in docs/architecture.md |
+| `architecture.svg` | System architecture diagram | ✅ Committed (docs/images/architecture.svg) |
+| `architecture.png` | System architecture diagram (PNG export) | ⏳ Pending export |
 | `test-results.png` | Playwright test results screenshot | ⏳ TBD - pending live execution |
 | `coverage.png` | Test coverage report | ⏳ TBD - pending live execution |
 | `workflow.png` | GitHub Actions CI workflow diagram | ⏳ TBD |

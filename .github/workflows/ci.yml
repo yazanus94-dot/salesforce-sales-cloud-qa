@@ -1,19 +1,55 @@
-name: CI
+name: CI — Salesforce QA Automation Framework
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+  schedule:
+    # Nightly regression run at 02:00 UTC
+    - cron: '0 2 * * *'
   workflow_dispatch:
+    inputs:
+      suite:
+        description: 'Test suite to run'
+        required: true
+        type: choice
+        default: smoke
+        options:
+          - smoke
+          - regression
+          - all
+      browser:
+        description: 'Browser project'
+        required: false
+        type: choice
+        default: chromium
+        options:
+          - chromium
+          - firefox
+          - webkit
+      environment:
+        description: 'Target environment'
+        required: false
+        type: choice
+        default: sandbox
+        options:
+          - sandbox
+          - developer
+          - production-readonly
 
 jobs:
-  test:
+  # ------------------------------------------------------------------
+  # Pull Request testing: lint, type checks, smoke tests, reports
+  # ------------------------------------------------------------------
+  pr-test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    if: github.event_name == 'pull_request'
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -33,8 +69,8 @@ jobs:
       - name: Run lint
         run: npm run lint
 
-      - name: Run Playwright tests
-        run: npm test
+      - name: Run smoke tests (PR fast feedback)
+        run: npm run test:smoke
         env:
           CI: true
           SF_BASE_URL: ${{ secrets.SF_BASE_URL }}
@@ -42,18 +78,171 @@ jobs:
           SF_PASSWORD: ${{ secrets.SF_PASSWORD }}
           SF_SECURITY_TOKEN: ${{ secrets.SF_SECURITY_TOKEN }}
 
-      - name: Upload Playwright report
+      - name: Publish test reports and failure artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
-          path: playwright-report/
+          name: pr-playwright-report
+          path: |
+            playwright-report/
+            test-results/
+            screenshots/
           retention-days: 7
 
-      - name: Upload test results
+  # ------------------------------------------------------------------
+  # Main branch testing: functional + regression suites, HTML + JUnit reports
+  # ------------------------------------------------------------------
+  main-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    if: github.event_name == 'push'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers (${{ matrix.browser }})
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Run type check
+        run: npm run types
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Run regression suite (main branch)
+        run: npx playwright test --grep @regression --project ${{ matrix.browser }} --reporter=html,json
+        env:
+          CI: true
+          PLAYWRIGHT_JUNIT_OUTPUT_NAME: junit-${{ matrix.browser }}.xml
+          SF_BASE_URL: ${{ secrets.SF_BASE_URL }}
+          SF_USERNAME: ${{ secrets.SF_USERNAME }}
+          SF_PASSWORD: ${{ secrets.SF_PASSWORD }}
+          SF_SECURITY_TOKEN: ${{ secrets.SF_SECURITY_TOKEN }}
+
+      - name: Publish HTML report and JUnit XML
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
-          path: test-results/
+          name: main-${{ matrix.browser }}-report
+          path: |
+            playwright-report/
+            test-results/
+            junit-*.xml
+          retention-days: 7
+
+      - name: Upload JUnit results for GitHub summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-${{ matrix.browser }}
+          path: junit-*.xml
+          retention-days: 7
+
+  # ------------------------------------------------------------------
+  # Scheduled nightly regression testing
+  # ------------------------------------------------------------------
+  nightly-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    if: github.event_name == 'schedule'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run full regression suite (nightly)
+        run: npm run test:regression
+        env:
+          CI: true
+          SF_BASE_URL: ${{ secrets.SF_BASE_URL }}
+          SF_USERNAME: ${{ secrets.SF_USERNAME }}
+          SF_PASSWORD: ${{ secrets.SF_PASSWORD }}
+          SF_SECURITY_TOKEN: ${{ secrets.SF_SECURITY_TOKEN }}
+
+      - name: Preserve nightly regression artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-regression-report
+          path: |
+            playwright-report/
+            test-results/
+            screenshots/
+          retention-days: 30
+
+  # ------------------------------------------------------------------
+  # Manual execution: user-selected suite, browser, environment
+  # ------------------------------------------------------------------
+  manual-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    if: github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers (${{ github.event.inputs.browser }})
+        run: npx playwright install --with-deps ${{ github.event.inputs.browser }}
+
+      - name: Run selected suite (${{ github.event.inputs.suite }})
+        run: |
+          if [ "${{ github.event.inputs.suite }}" = "smoke" ]; then
+            npm run test:smoke -- --project ${{ github.event.inputs.browser }}
+          elif [ "${{ github.event.inputs.suite }}" = "regression" ]; then
+            npm run test:regression -- --project ${{ github.event.inputs.browser }}
+          else
+            npm test -- --project ${{ github.event.inputs.browser }}
+          fi
+        env:
+          CI: true
+          SF_BASE_URL: ${{ secrets.SF_BASE_URL }}
+          SF_USERNAME: ${{ secrets.SF_USERNAME }}
+          SF_PASSWORD: ${{ secrets.SF_PASSWORD }}
+          SF_SECURITY_TOKEN: ${{ secrets.SF_SECURITY_TOKEN }}
+
+      - name: Publish manual execution artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: manual-${{ github.event.inputs.suite }}-report
+          path: |
+            playwright-report/
+            test-results/
           retention-days: 7

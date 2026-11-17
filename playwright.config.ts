@@ -12,7 +12,11 @@ const config: PlaywrightTestConfig = {
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 4 : undefined,
   reporter: process.env.CI
-    ? [['github'], ['html', { outputFolder: 'playwright-report/ci' }]]
+    ? [
+        ['github'],
+        ['html', { outputFolder: 'playwright-report/ci' }],
+        ['junit', { outputFile: 'junit.xml' }],
+      ]
     : [['html', { outputFolder: 'playwright-report' }]],
   use: {
     baseURL: process.env.SF_BASE_URL || 'https://login.salesforce.com',

@@ -88,16 +88,16 @@ export class LeadPage extends BasePage {
         rating?: string;
         industry?: string;
     }): Promise<void> {
-        if (data.salutation) await this.safeFill(this.salutationSelect, data.salutation);
+        if (data.salutation) {await this.safeFill(this.salutationSelect, data.salutation);}
         await this.safeFill(this.firstNameInput, data.firstName);
         await this.safeFill(this.lastNameInput, data.lastName);
         await this.safeFill(this.companyInput, data.company);
-        if (data.email) await this.safeFill(this.emailInput, data.email);
-        if (data.phone) await this.safeFill(this.phoneInput, data.phone);
-        if (data.status) await this.safeFill(this.statusSelect, data.status);
-        if (data.source) await this.safeFill(this.sourceSelect, data.source);
-        if (data.rating) await this.safeFill(this.ratingSelect, data.rating);
-        if (data.industry) await this.safeFill(this.industrySelect, data.industry);
+        if (data.email) {await this.safeFill(this.emailInput, data.email);}
+        if (data.phone) {await this.safeFill(this.phoneInput, data.phone);}
+        if (data.status) {await this.safeFill(this.statusSelect, data.status);}
+        if (data.source) {await this.safeFill(this.sourceSelect, data.source);}
+        if (data.rating) {await this.safeFill(this.ratingSelect, data.rating);}
+        if (data.industry) {await this.safeFill(this.industrySelect, data.industry);}
     }
 
     /**

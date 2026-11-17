@@ -1,0 +1,33 @@
+{
+  "newman": {
+    "collection": "./postman/collections/Salesforce-Service-Cloud.postman_collection.json",
+    "environment": "./postman/environments/Salesforce-Service-Cloud.postman_environment.json",
+    "reporters": ["cli", "json"],
+    "reporter": {
+      "cli": {
+        "assertions": true,
+        "console": true,
+        "failure": true
+      },
+      "json": {
+        "export": "./reports/newman-report.json"
+      }
+    },
+    "iterationCount": 1,
+    "timeout": 30000,
+    "delayRequest": 0,
+    "ignoreRedirects": false,
+    "suppressExitCode": false
+  },
+  "scripts": {
+    "test:newman": "newman run ./postman/collections/Salesforce-Service-Cloud.postman_collection.json -e ./postman/environments/Salesforce-Service-Cloud.postman_environment.json -r cli,json --reporter-json-export ./reports/newman-report.json",
+    "test:newman:ci": "newman run ./postman/collections/Salesforce-Service-Cloud.postman_collection.json -e ./postman/environments/Salesforce-Service-Cloud.postman_environment.json -r cli,junit --reporter-junit-export ./reports/newman-junit.xml --reporter-cli-no-assertions false"
+  },
+  "notes": [
+    "Prerequisite: npm install -g newman newman-reporter-html newman-reporter-junit",
+    "Required variables: clientId, clientSecret, username, password (password + security token)",
+    "Credentials are NOT committed to the repo; set them via environment variables or Postman environment.",
+    "Authentication is OAuth 2.0 username-password flow.",
+    "All API responses are validated via Postman test scripts in the collection."
+  ]
+}

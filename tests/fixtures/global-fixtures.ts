@@ -1,10 +1,10 @@
-import type { Page } from '@playwright/test';
-import { test as base, type TestInfo } from '@playwright/test';
+import { test as base } from '@playwright/test';
 import { LoginPage } from '../../src/pages/login.page';
 import { LeadPage } from '../../src/pages/lead.page';
 import { AccountPage } from '../../src/pages/account.page';
 import { ContactPage } from '../../src/pages/contact.page';
 import { OpportunityPage } from '../../src/pages/opportunity.page';
+import { CasePage } from '../../src/pages/case.page';
 import { AuthFixture } from '../../src/fixtures/auth.fixture';
 
 // Extend base test with custom fixtures
@@ -14,6 +14,7 @@ export const test = base.extend<{
   accountPage: AccountPage;
   contactPage: ContactPage;
   opportunityPage: OpportunityPage;
+  casePage: CasePage;
   auth: AuthFixture;
 }>({
   loginPage: async ({ page }, use) => {
@@ -30,6 +31,9 @@ export const test = base.extend<{
   },
   opportunityPage: async ({ page }, use) => {
     await use(new OpportunityPage(page));
+  },
+  casePage: async ({ page }, use) => {
+    await use(new CasePage(page));
   },
   auth: async ({ page }, use) => {
     await use(new AuthFixture(page));

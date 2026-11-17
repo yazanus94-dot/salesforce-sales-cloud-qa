@@ -1,5 +1,5 @@
 import { test, expect } from '../../fixtures';
-import { leadData, accountData, contactData } from '../../../src/fixtures/test-data.factory';
+import { leadData } from '../../../src/fixtures/test-data.factory';
 
 /**
  * Lead Conversion Tests (8-11)
@@ -15,7 +15,7 @@ test.describe('Lead Conversion', () => {
     await leadPage.clickNew();
     await leadPage.fillLeadForm(data);
     await leadPage.save();
-    await expect(leadPage.leadExists(`${data.firstName} ${data.lastName}`)).toBeTruthy();
+    expect(leadPage.leadExists(`${data.firstName} ${data.lastName}`)).toBeTruthy();
 
     // Open lead and convert
     await leadPage.openLead(`${data.firstName} ${data.lastName}`);
@@ -51,7 +51,7 @@ test.describe('Lead Conversion', () => {
       // Verify account was created or linked
       await accountPage.gotoAccountsTab();
       await accountPage.searchAccount(data.company);
-      await expect(accountPage.accountExists(data.company)).toBeTruthy();
+      expect(accountPage.accountExists(data.company)).toBeTruthy();
     } else {
       expect(true).toBeTruthy();
     }
@@ -74,7 +74,7 @@ test.describe('Lead Conversion', () => {
       // Verify contact was created or linked
       await contactPage.gotoContactsTab();
       await contactPage.searchContact(`${data.firstName} ${data.lastName}`);
-      await expect(contactPage.contactExists(`${data.firstName} ${data.lastName}`)).toBeTruthy();
+      expect(contactPage.contactExists(`${data.firstName} ${data.lastName}`)).toBeTruthy();
     } else {
       expect(true).toBeTruthy();
     }
